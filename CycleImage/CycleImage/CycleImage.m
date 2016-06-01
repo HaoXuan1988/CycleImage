@@ -121,7 +121,7 @@ static NSTimeInterval _timeInterval = 5.0;
      *  先处理占位图
      */
     if (!placeholderImage) {
-        self.placeholderImage = [UIImage imageWithContentsOfFile:[[NSBundle mainBundle]pathForResource:@"photo_default" ofType:@"png"]];
+        self.placeholderImage = [UIImage imageWithContentsOfFile:[[NSBundle mainBundle]pathForResource:@"hx_photo_default" ofType:@"png"]];
     }else{
         self.placeholderImage = placeholderImage;
     }
@@ -212,15 +212,15 @@ static NSTimeInterval _timeInterval = 5.0;
      *  取出当前可见单元格
      */
     NSIndexPath *visiablePath = [[collectionView indexPathsForVisibleItems] firstObject];
-    if (visiablePath.item == 90 % self.data.count) {
+    if (visiablePath.item == 90) {
         [self.collectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForRow:50 inSection:0] atScrollPosition:UICollectionViewScrollPositionLeft animated:NO];
-    }else if (visiablePath.item == 10 % self.data.count) {
+    }else if (visiablePath.item == 10) {
         [self.collectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForRow:50 inSection:0] atScrollPosition:UICollectionViewScrollPositionLeft animated:NO];
     }
     self.page.currentPage = visiablePath.item % self.data.count;
 }
 
-#pragma mark 选中itme回调
+#pragma mark 点击 itme 回调
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
     
     [self.delegate clickWithItme:indexPath.item % self.data.count];
