@@ -11,11 +11,14 @@
 #import "UIImageView+WebCache.h"
 
 static NSString * const cycleImageIdentifier = @"CycleImageCollectionViewCell";
-static NSTimeInterval _timeInterval = 5.0;
+
 
 
 @interface CycleImage ()<UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout>
 
+/**
+ *  海报
+ */
 @property (nonatomic, strong) UICollectionView *collectionView;
 @property (nonatomic, strong) UICollectionViewFlowLayout *customLayout;
 
@@ -35,75 +38,114 @@ static NSTimeInterval _timeInterval = 5.0;
 @property (nonatomic, strong) NSArray *data;
 
 /**
- *  图像占位符
+ *  底部图片
  */
-@property (nonatomic, strong) UIImage *placeholderImage;
+@property (nonatomic, strong) UIImageView *bottomView;
 
 @end
 
 @implementation CycleImage
 
 #pragma mark - 初始化
-- (instancetype)initWithFrame:(CGRect)frame {
+- (instancetype)initWithFrame:(CGRect)frame placeholderImage:(UIImage *)placeholderImage {
     self = [super initWithFrame:frame];
     if (self) {
         
-        [self setBackgroundColor:[UIColor clearColor]];
-        /**
-         
-         创建广告位
-         
-         */
-        self.customLayout = [[UICollectionViewFlowLayout alloc]init];
-        self.customLayout.itemSize = frame.size;
-        self.customLayout.minimumLineSpacing = 0;
-        self.customLayout.minimumInteritemSpacing = 0;
-        self.customLayout.sectionInset = UIEdgeInsetsMake(0, 0, 0, 0);
-        self.customLayout.scrollDirection = UICollectionViewScrollDirectionHorizontal;
         
-        self.collectionView = [[UICollectionView alloc]initWithFrame:self.bounds collectionViewLayout:self.customLayout];
-        self.collectionView.delegate = self;
-        self.collectionView.dataSource = self;
-        self.collectionView.pagingEnabled = YES;
-        self.collectionView.showsVerticalScrollIndicator = NO;
-        self.collectionView.showsHorizontalScrollIndicator = NO;
-        self.collectionView.backgroundColor = [UIColor clearColor];
-        [self.collectionView registerClass:[CycleImageCollectionViewCell class] forCellWithReuseIdentifier:cycleImageIdentifier];
+        self.placeholderImage = placeholderImage;
+        
+        if (!_bottomView) {
+            _bottomView = [[UIImageView alloc]initWithFrame:self.bounds];
+            [_bottomView setImage:_placeholderImage];
+            [self addSubview:_bottomView];
+        }
+        
+        //默认五秒循环
+        _timeInterval = 5.0;
+        
+        [self setBackgroundColor:[UIColor clearColor]];
+        
+
+        
+        //创建广告位
         [self addSubview:self.collectionView];
         
-        /**
-         
-         创建页码
-         
-         */
-        self.page = [[UIPageControl alloc]init];
-        self.page.center = CGPointMake(frame.size.width * 0.5, frame.size.height - 20);
-        self.page.bounds = CGRectMake(0, 0, frame.size.width, 0);
-        self.page.pageIndicatorTintColor = [UIColor grayColor];
-        self.page.currentPageIndicatorTintColor = [UIColor whiteColor];
-        [self addSubview:self.page];
-        
-        /**
-         
-         创建定时器
-         
-         */
-        [self addTimer];
     }
     return self;
+}
+
+- (UICollectionView *)collectionView {
+    
+    if (!_collectionView) {
+        
+        _customLayout = [[UICollectionViewFlowLayout alloc]init];
+        _customLayout.itemSize = self.frame.size;
+        _customLayout.minimumLineSpacing = 0;
+        _customLayout.minimumInteritemSpacing = 0;
+        _customLayout.sectionInset = UIEdgeInsetsMake(0, 0, 0, 0);
+        _customLayout.scrollDirection = UICollectionViewScrollDirectionHorizontal;
+        
+        _collectionView = [[UICollectionView alloc]initWithFrame:self.bounds collectionViewLayout:_customLayout];
+        _collectionView.delegate = self;
+        _collectionView.dataSource = self;
+        _collectionView.pagingEnabled = YES;
+        _collectionView.scrollEnabled = YES;
+        _collectionView.showsVerticalScrollIndicator = NO;
+        _collectionView.showsHorizontalScrollIndicator = NO;
+        _collectionView.backgroundColor = [UIColor clearColor];
+        [_collectionView registerClass:[CycleImageCollectionViewCell class] forCellWithReuseIdentifier:cycleImageIdentifier];
+        
+    }
+    return _collectionView;
+}
+
+- (UIPageControl *)page {
+    
+    if (!_page) {
+        
+        _page = [[UIPageControl alloc]init];
+        _page.center = CGPointMake(self.frame.size.width * 0.5, self.frame.size.height - 20);
+        _page.bounds = CGRectMake(0, 0, self.frame.size.width, 0);
+        _page.pageIndicatorTintColor = [UIColor colorWithRed:0.44 green:0.44 blue:0.44 alpha:0.50];
+        _page.currentPageIndicatorTintColor = [UIColor colorWithRed:1.00 green:1.00 blue:1.00 alpha:0.80];
+    }
+    return _page;
+}
+
+- (NSArray *)data {
+    
+    if (!_data) {
+        
+        _data = [NSArray array];
+    }
+    return _data;
+}
+
+- (UIImage *)placeholderImage {
+    
+    if (!_placeholderImage) {
+        
+        _placeholderImage = [UIImage imageWithContentsOfFile:[[NSBundle mainBundle]pathForResource:@"hx_photo_default" ofType:@"png"]];
+        
+    }
+
+    return _placeholderImage;
 }
 
 #pragma mark - 加载数据,设置占位符图片.
 - (void)setImages:(NSArray *)images placeholderImage:(UIImage *)placeholderImage timeInterval:(NSTimeInterval)timeInterval{
     
     /**
-     *  间隔时间,不想循环就填: -1  (默认 5 秒)
+     * 移除底部图片
      */
-    if (timeInterval != _timeInterval && timeInterval >= 0) {
-        _timeInterval = timeInterval;
-        [self removeTimer];
-        [self addTimer];
-    }
+    [_bottomView removeFromSuperview];
+    _bottomView = nil;
+    
+    /**
+     *  间隔时间,不想循环就填: 0   (默认 5 秒)
+     */
+    _timeInterval = timeInterval;
+    
     
     /**
      *  进行预加载图片(这个方法有点投机取巧了,不是很好)
@@ -121,23 +163,52 @@ static NSTimeInterval _timeInterval = 5.0;
      *  先处理占位图
      */
     if (!placeholderImage) {
-        self.placeholderImage = [UIImage imageWithContentsOfFile:[[NSBundle mainBundle]pathForResource:@"hx_photo_default" ofType:@"png"]];
-    }else{
-        self.placeholderImage = placeholderImage;
+        _placeholderImage = placeholderImage;
     }
+    
     
     /**
      *  再进行接下来的步骤
      */
-    self.data = [images copy];
+    if (!images) {
+        self.collectionView.allowsSelection = NO;
+        self.data = @[self.placeholderImage];
+    }else{
     
-    self.page.numberOfPages = self.data.count;
+        self.collectionView.allowsSelection = YES;
+        self.data = [images copy];
+    }
     
-    self.page.currentPage = 50 % self.data.count;
+    if (self.data.count <= 1) {
+        
+        _timeInterval = 0;
+        
+        [self removeTimer];
+        
+        self.collectionView.scrollEnabled = NO;
+        
+        [self.page removeFromSuperview];
+        
+        self.page = nil;
+    }else{
+        [self addTimer];
+        
+        self.collectionView.scrollEnabled = YES;
+        
+        self.page.numberOfPages = self.data.count;
+        
+        self.page.currentPage = 50 % self.data.count;
+        
+        //创建页码
+        [self addSubview:self.page];
+    }
+    
+    
     
     [self.collectionView reloadData];
     
     [self.collectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForRow:50 inSection:0] atScrollPosition:UICollectionViewScrollPositionLeft animated:NO];
+    
     
 }
 
@@ -149,7 +220,9 @@ static NSTimeInterval _timeInterval = 5.0;
 
 #pragma mark - 创建定时器
 - (void)addTimer {
-    
+    if (_timeInterval <= 0) {
+        return;
+    }
     self.timer = [NSTimer scheduledTimerWithTimeInterval:_timeInterval target:self selector:@selector(next) userInfo:nil repeats:YES];
     [[NSRunLoop currentRunLoop] addTimer:self.timer forMode:NSRunLoopCommonModes];
 }
@@ -222,8 +295,11 @@ static NSTimeInterval _timeInterval = 5.0;
 
 #pragma mark 点击 itme 回调
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
-    
-    [self.delegate clickWithItme:indexPath.item % self.data.count];
+    [self removeTimer];
+    if ([self.delegate respondsToSelector:@selector(clickWithItme:)]) {
+        [self.delegate clickWithItme:indexPath.item % self.data.count];
+    }
+    [self addTimer];
 }
 
 #pragma mark - 编码
@@ -238,11 +314,11 @@ static NSTimeInterval _timeInterval = 5.0;
 }
 
 /*
-// Only override drawRect: if you perform custom drawing.
-// An empty implementation adversely affects performance during animation.
-- (void)drawRect:(CGRect)rect {
-    // Drawing code
-}
-*/
+ // Only override drawRect: if you perform custom drawing.
+ // An empty implementation adversely affects performance during animation.
+ - (void)drawRect:(CGRect)rect {
+ // Drawing code
+ }
+ */
 
 @end

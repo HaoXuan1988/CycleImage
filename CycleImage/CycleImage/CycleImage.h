@@ -10,6 +10,7 @@
 
 @protocol CycleImageDelegate <NSObject>
 
+@optional
 /**
  *  点击事件回调
  *
@@ -18,11 +19,29 @@
 - (void)clickWithItme:(NSInteger)itme;
 
 @end
-
 @interface CycleImage : UIView
+
 
 @property (nonatomic, weak) id<CycleImageDelegate> delegate;
 
+
+/**
+ *  图像占位符
+ */
+@property (nonatomic, strong) UIImage *placeholderImage;
+
+@property (nonatomic, assign) NSTimeInterval timeInterval;
+
+
+/**
+ *  初始化并且设置 placeholder
+ *
+ *  @param frame            frame
+ *  @param placeholderImage placeholderImage
+ *
+ *  @return self
+ */
+- (instancetype)initWithFrame:(CGRect)frame placeholderImage:(UIImage *)placeholderImage;
 /**
  *  加载数据,设置占位符图片
  *
