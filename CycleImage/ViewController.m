@@ -34,18 +34,19 @@
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     
-//    NSArray *imageArray = nil;
-//    [self.images reloadData:imageArray];
+    NSArray *imageArray = @[@"http://img.sootuu.com/vector/200801/097/341.jpg"];
+    [self.images reloadData:imageArray];
+
 }
 
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
     
-    self.view.backgroundColor = [UIColor whiteColor];
+    self.view.backgroundColor = [UIColor greenColor];
     
     self.images = [[CycleImage alloc]initWithFrame:CGRectMake(0, 100, 414, 200) placeholderImage:nil];
-    
+    self.images.delegate = self;
     
     [self.view addSubview:self.images];
     

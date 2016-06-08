@@ -54,7 +54,7 @@ static NSString * const cycleImageIdentifier = @"CycleImageCollectionViewCell";
         
         self.placeholderImage = placeholderImage;
         
-        if (!_bottomView) {
+        if (!_bottomView && _placeholderImage) {
             _bottomView = [[UIImageView alloc]initWithFrame:self.bounds];
             [_bottomView setImage:_placeholderImage];
             [self addSubview:_bottomView];
@@ -65,7 +65,7 @@ static NSString * const cycleImageIdentifier = @"CycleImageCollectionViewCell";
         
         [self setBackgroundColor:[UIColor clearColor]];
         
-
+        
         
         //创建广告位
         [self addSubview:self.collectionView];
@@ -121,17 +121,6 @@ static NSString * const cycleImageIdentifier = @"CycleImageCollectionViewCell";
     return _data;
 }
 
-- (UIImage *)placeholderImage {
-    
-    if (!_placeholderImage) {
-        
-        _placeholderImage = [UIImage imageWithContentsOfFile:[[NSBundle mainBundle]pathForResource:@"hx_photo_default" ofType:@"png"]];
-        
-    }
-
-    return _placeholderImage;
-}
-
 #pragma mark - 加载数据,设置占位符图片.
 - (void)setImages:(NSArray *)images placeholderImage:(UIImage *)placeholderImage timeInterval:(NSTimeInterval)timeInterval{
     
@@ -170,14 +159,7 @@ static NSString * const cycleImageIdentifier = @"CycleImageCollectionViewCell";
     /**
      *  再进行接下来的步骤
      */
-    if (!images) {
-        self.collectionView.allowsSelection = NO;
-        self.data = @[self.placeholderImage];
-    }else{
-    
-        self.collectionView.allowsSelection = YES;
-        self.data = [images copy];
-    }
+    self.data = images;
     
     if (self.data.count <= 1) {
         
@@ -197,7 +179,7 @@ static NSString * const cycleImageIdentifier = @"CycleImageCollectionViewCell";
         
         self.page.numberOfPages = self.data.count;
         
-        self.page.currentPage = 50 % self.data.count;
+        self.page.currentPage = 0;
         
         //创建页码
         [self addSubview:self.page];
@@ -207,7 +189,12 @@ static NSString * const cycleImageIdentifier = @"CycleImageCollectionViewCell";
     
     [self.collectionView reloadData];
     
-    [self.collectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForRow:50 inSection:0] atScrollPosition:UICollectionViewScrollPositionLeft animated:NO];
+    if (!images) {
+        self.collectionView.allowsSelection = NO;
+    }else{
+        self.collectionView.allowsSelection = YES;
+        [self.collectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForRow:(50 * _data.count) inSection:0] atScrollPosition:UICollectionViewScrollPositionLeft animated:NO];
+    }
     
     
 }

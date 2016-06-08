@@ -36,6 +36,15 @@
     }
 }
 
+- (UIImage *)placeholderImage {
+    
+    if (!_placeholderImage) {
+        
+        _placeholderImage = [UIImage imageWithContentsOfFile:[[NSBundle mainBundle]pathForResource:@"hx_photo_default" ofType:@"png"]];
+    }
+    return _placeholderImage;
+}
+
 //编码
 - (NSString *)hx_URLEncodedString:(NSString *)string
 {
