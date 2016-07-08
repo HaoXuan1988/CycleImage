@@ -26,6 +26,7 @@
 @interface ViewController ()<CycleImageDelegate>
 
 @property (nonatomic, strong) CycleImage *images;
+@property (nonatomic, strong) NSMutableArray *imageArray;
 
 @end
 
@@ -34,8 +35,11 @@
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     
-    NSArray *imageArray = @[@"http://img.sootuu.com/vector/200801/097/341.jpg"];
-    [self.images reloadData:imageArray];
+    _imageArray = [NSMutableArray array];
+    
+    [_imageArray addObject:@"http://img.sootuu.com/vector/200801/097/341.jpg"];
+    
+    [self.images reloadData:_imageArray];
 
 }
 

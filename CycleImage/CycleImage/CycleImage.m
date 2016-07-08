@@ -189,7 +189,7 @@ static NSString * const cycleImageIdentifier = @"CycleImageCollectionViewCell";
     
     [self.collectionView reloadData];
     
-    if (!images) {
+    if (!images || images.count == 0) {
         self.collectionView.allowsSelection = NO;
     }else{
         self.collectionView.allowsSelection = YES;
