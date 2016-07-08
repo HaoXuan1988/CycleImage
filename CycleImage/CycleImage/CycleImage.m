@@ -272,10 +272,10 @@ static NSString * const cycleImageIdentifier = @"CycleImageCollectionViewCell";
      *  取出当前可见单元格
      */
     NSIndexPath *visiablePath = [[collectionView indexPathsForVisibleItems] firstObject];
-    if (visiablePath.item == 90) {
-        [self.collectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForRow:50 inSection:0] atScrollPosition:UICollectionViewScrollPositionLeft animated:NO];
-    }else if (visiablePath.item == 10) {
-        [self.collectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForRow:50 inSection:0] atScrollPosition:UICollectionViewScrollPositionLeft animated:NO];
+    if (visiablePath.item == 95 * _data.count) {
+        [self.collectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForRow:(50 * _data.count) inSection:0] atScrollPosition:UICollectionViewScrollPositionLeft animated:NO];
+    }else if (visiablePath.item == 5 * _data.count) {
+        [self.collectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForRow:(50 * _data.count) inSection:0] atScrollPosition:UICollectionViewScrollPositionLeft animated:NO];
     }
     self.page.currentPage = visiablePath.item % self.data.count;
 }
